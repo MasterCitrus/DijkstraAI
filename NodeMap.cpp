@@ -88,7 +88,7 @@ void NodeMap::DrawPath(std::vector<Node*> path, Color lineColour)
 	for (int i = 1; i < path.size(); i++)
 	{
 		Node* node = *(path.begin() + i);
-		Node* prevNode = node->previous;
+		Node* prevNode = *(path.begin() + (i - 1));
 		DrawLine(prevNode->position.x, prevNode->position.y, (int)node->position.x, (int)node->position.y, lineColour);
 	}
 }
@@ -120,11 +120,11 @@ std::vector<Node*> NodeMap::DijkstraSearch(Node* startNode, Node* endNode)
 
 		for (auto& c : currentNode->connections)
 		{
-			if (std::binary_search(closedList.begin(), closedList.end(), c.target))
+			if (std::find(closedList.begin(), closedList.end(), c.target) == closedList.end())
 			{
 				int gScore = currentNode->gScore + c.cost;
 
-				if (std::binary_search(openList.begin(), openList.end(), c.target))
+				if (std::find(openList.begin(), openList.end(), c.target) == openList.end())
 				{
 					c.target->gScore = gScore;
 					c.target->previous = currentNode;
