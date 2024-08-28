@@ -1,6 +1,6 @@
 #include "NodeMap.h"
-#include "raylib.h"
 #include <iostream>
+#include <algorithm>
 
 void NodeMap::Intialise(std::vector<std::string> asciiMap, int cellSize)
 {
@@ -54,28 +54,101 @@ void NodeMap::Intialise(std::vector<std::string> asciiMap, int cellSize)
 	}
 }
 
-void NodeMap::Draw()
+void NodeMap::Draw(bool draw)
 {
 	Color cellColour{ 255, 0, 0, 255 };
-	Color lineColour{ 0, 0, 0, 255 };
+	Color lineColour{ 127, 127, 127, 255 };
 
-	for (int y = 0; y < m_height; y++)
+	if (draw)
 	{
-		for (int x = 0; x < m_width; x++)
+		for (int y = 0; y < m_height; y++)
 		{
-			Node* node = GetNode(x, y);
-			if (node == nullptr)
+			for (int x = 0; x < m_width; x++)
 			{
-				DrawRectangle(x * m_cellSize, y * m_cellSize, m_cellSize - 1, m_cellSize - 1, cellColour);
-			}
-			else
-			{
-				for (int i = 0; i < node->connections.size(); i++)
+				Node* node = GetNode(x, y);
+				if (node == nullptr)
 				{
-					Node* other = node->connections[i].target;
-					DrawLine((x + 0.5f) * m_cellSize, (y + 0.5f) * m_cellSize, (int)other->position.x, (int)other->position.y, lineColour);
+					DrawRectangle(x * m_cellSize, y * m_cellSize, m_cellSize - 1, m_cellSize - 1, cellColour);
+				}
+				else
+				{
+					for (int i = 0; i < node->connections.size(); i++)
+					{
+						Node* other = node->connections[i].target;
+						DrawLine((x + 0.5f) * m_cellSize, (y + 0.5f) * m_cellSize, (int)other->position.x, (int)other->position.y, lineColour);
+					}
 				}
 			}
 		}
 	}
+}
+
+void NodeMap::DrawPath(std::vector<Node*> path, Color lineColour)
+{
+	for (int i = 1; i < path.size(); i++)
+	{
+		Node* node = *(path.begin() + i);
+		Node* prevNode = node->previous;
+		DrawLine(prevNode->position.x, prevNode->position.y, (int)node->position.x, (int)node->position.y, lineColour);
+	}
+}
+
+std::vector<Node*> NodeMap::DijkstraSearch(Node* startNode, Node* endNode)
+{
+	if (startNode == nullptr || endNode == nullptr) std::cout << "Nodes do not exist.\n";
+
+	if(startNode == endNode) return std::vector<Node*>();
+	
+	startNode->gScore = 0;
+	startNode->previous = nullptr;
+
+	std::vector<Node*> openList;
+	std::vector<Node*> closedList;
+
+	openList.push_back(startNode);
+
+	while (!openList.empty())
+	{
+		if (openList.size() > 1) std::sort(openList.begin(), openList.end(), Node::Compare);
+
+		Node* currentNode = *openList.begin();
+
+		if (currentNode == endNode) break;
+
+		openList.erase(openList.begin());
+		closedList.push_back(currentNode);
+
+		for (auto& c : currentNode->connections)
+		{
+			if (std::binary_search(closedList.begin(), closedList.end(), c.target))
+			{
+				int gScore = currentNode->gScore + c.cost;
+
+				if (std::binary_search(openList.begin(), openList.end(), c.target))
+				{
+					c.target->gScore = gScore;
+					c.target->previous = currentNode;
+					openList.push_back(c.target);
+				}
+				else if (gScore < c.target->gScore)
+				{
+					c.target->gScore = gScore;
+					c.target->previous = currentNode;
+				}
+			}
+		}
+	}
+
+	std::vector<Node*> path;
+	Node* currentNode = endNode;
+
+	while (currentNode)
+	{
+		path.push_back(currentNode);
+		currentNode = currentNode->previous;
+	}
+
+	//std::reverse(path.begin(), path.end());
+
+	return path;
 }

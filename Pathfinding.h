@@ -18,9 +18,14 @@ struct Node
 {
 	glm::vec2 position;
 	std::vector<Edge> connections;
-public:
+
+	float gScore;
+	Node* previous;
+
 	Node(float x, float y);
 
 	void ConnectTo(Node* other, float cost);
+
+	static bool Compare(Node* a, Node* b);
 };
 

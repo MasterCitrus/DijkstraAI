@@ -12,6 +12,8 @@ int main()
 
 	SetTargetFPS(60);
 
+	NodeMap map;
+
 	std::vector<std::string> asciiMap;
 	asciiMap.push_back("000000000000");
 	asciiMap.push_back("010111011100");
@@ -21,17 +23,21 @@ int main()
 	asciiMap.push_back("010000001000");
 	asciiMap.push_back("011111111110");
 	asciiMap.push_back("000000000000");
-
-	NodeMap map;
 	map.Intialise(asciiMap, 50);
+
+	Node* start = map.GetNode(1, 1);
+	Node* end = map.GetNode(10, 2);
+	std::vector<Node*> nodeMapPath = NodeMap::DijkstraSearch(start, end);
+	Color lineColour = { 255, 255, 0, 255 };
 
 	while (!WindowShouldClose())
 	{
 		BeginDrawing();
 
-		ClearBackground(RAYWHITE);
+		ClearBackground(BLACK);
 
-		map.Draw();
+		map.Draw(true);
+		map.DrawPath(nodeMapPath, lineColour);
 
 		EndDrawing();
 	}
