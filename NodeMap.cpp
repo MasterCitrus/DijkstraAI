@@ -95,7 +95,13 @@ void NodeMap::DrawPath(std::vector<Node*> path, Color lineColour)
 
 std::vector<Node*> NodeMap::DijkstraSearch(Node* startNode, Node* endNode)
 {
-	if (startNode == nullptr || endNode == nullptr) std::cout << "Nodes do not exist.\n";
+	if (startNode == nullptr || endNode == nullptr) 
+	{ 
+		if(startNode == nullptr && endNode == nullptr) std::cout << "Nodes do not exist.\n";
+		else if(startNode == nullptr) std::cout << "startNode does not exist.\n";
+		else if(endNode == nullptr) std::cout << "endNode do not exist.\n";
+		return std::vector<Node*>(); 
+	}
 
 	if(startNode == endNode) return std::vector<Node*>();
 	
@@ -148,7 +154,17 @@ std::vector<Node*> NodeMap::DijkstraSearch(Node* startNode, Node* endNode)
 		currentNode = currentNode->previous;
 	}
 
-	//std::reverse(path.begin(), path.end());
+	std::reverse(path.begin(), path.end());
 
 	return path;
+}
+
+Node* NodeMap::GetClosestNode(glm::vec2 worldPos)
+{
+	int i = (int)(worldPos.x / m_cellSize);
+	if (i < 0 || i >= m_width) return nullptr;
+
+	int j = (int)(worldPos.y / m_cellSize);
+	if (j < 0 || j >= m_height) return nullptr;
+	return GetNode(i, j);
 }

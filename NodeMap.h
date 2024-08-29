@@ -2,6 +2,7 @@
 
 #include "raylib.h"
 #include "Pathfinding.h"
+#include "glm/vec2.hpp"
 #include <string>
 
 class NodeMap
@@ -21,5 +22,7 @@ public:
 	void DrawPath(std::vector<Node*> path, Color lineColour);
 
 	static std::vector<Node*> DijkstraSearch(Node* startNode, Node* endNode);
+
+	Node* GetClosestNode(glm::vec2 worldPos);
 };
 

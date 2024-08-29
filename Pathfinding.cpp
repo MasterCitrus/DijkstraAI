@@ -1,7 +1,7 @@
 #include "Pathfinding.h"
 #include <string>
 
-Node::Node(float x, float y) : position{ x, y }
+Node::Node(float x, float y) : position{ x, y }, gScore{ 0 }, previous{ nullptr }
 {
 }
 
@@ -12,6 +12,6 @@ void Node::ConnectTo(Node* other, float cost)
 
 bool Node::Compare(Node* a, Node* b)
 {
-	if (a->gScore > b->gScore) return true;
+	if (a->gScore < b->gScore) return true;
 	else return false;
 }
